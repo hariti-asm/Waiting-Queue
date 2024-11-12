@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:Waiting_list}
+    username: ${DB_USER:myuser}
+    password: ${DB_PASSWORD:secret}
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+
+logging:
+  level:
+    root: ERROR
+    com.yourpackage: INFO
+  file:
+    name: /var/log/wrm/application.log
