@@ -8,9 +8,3 @@ spring:
     hibernate:
       ddl-auto: none
 
-logging:
-  level:
-    root: ERROR
-    com.yourpackage: INFO
-  file:
-    name: /var/log/wrm/application.log

@@ -7,5 +7,22 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+
 server:
   port: 8081
+
+scheduling:
+  algorithms:
+    fifo:
+      name: "First In First Out"
+      description: "Simple queue based algorithm"
+    priority:
+      name: "Priority Based"
+      description: "Schedule based on priority"
+      priority-factors:
+        - "urgency"
+        - "waiting-time"
+        - "severity"
+    shortest-job-first:
+      name: "Shortest Job First"
+      description: "Schedule based on estimated duration"
