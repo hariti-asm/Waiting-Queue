@@ -1,7 +1,7 @@
-package ma.hariti.asmaa.wrm.implementation;
+package ma.hariti.asmaa.wrm.service;
 
 import ma.hariti.asmaa.wrm.entity.Visit;
-import ma.hariti.asmaa.wrm.service.SchedulingStrategy;
+import ma.hariti.asmaa.wrm.repository.SchedulingStrategy;
 
 import java.util.Comparator;
 import java.util.List;

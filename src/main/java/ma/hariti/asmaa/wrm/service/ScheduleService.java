@@ -1,4 +1,4 @@
-package ma.hariti.asmaa.wrm.implementation;
+package ma.hariti.asmaa.wrm.service;
 
 import ma.hariti.asmaa.wrm.config.SchedulingConfig;
 import ma.hariti.asmaa.wrm.dto.ScheduleConfigDTO;

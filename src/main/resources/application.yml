@@ -9,12 +9,13 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 server:
-  port: 8081
+  port: 8083
+
 scheduling:
   algorithms:
     fifo:
       name: "First In First Out"
-      description: "Simple queue based algorithm"
+      description: "Simple queue-based algorithm"
     priority:
       name: "Priority Based"
       description: "Schedule based on priority"
@@ -27,20 +28,20 @@ scheduling:
       description: "Schedule based on estimated duration"
 
   schedules:
-    - weekday: MONDAY
-      openingTime: 08:00
-      closingTime: 17:00
-    - weekday: TUESDAY
-      openingTime: 08:30
-      closingTime: 16:30
-    - weekday: WEDNESDAY
-      openingTime: 09:00
-      closingTime: 18:00
+    - weekday: "MONDAY"
+      opening-time: "08:00"
+      closing-time: "17:00"
+    - weekday: "TUESDAY"
+      opening-time: "08:30"
+      closing-time: "16:30"
+    - weekday: "WEDNESDAY"
+      opening-time: "09:00"
+      closing-time: "18:00"
 
   capacities:
-    - weekday: MONDAY
+    - weekday: "MONDAY"
       maxCapacity: 50
-    - weekday: TUESDAY
+    - weekday: "TUESDAY"
       maxCapacity: 60
-    - weekday: WEDNESDAY
+    - weekday: "WEDNESDAY"
       maxCapacity: 45

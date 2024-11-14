@@ -1,20 +1,25 @@
-package ma.hariti.asmaa.survey.survey.util;
+package ma.hariti.asmaa.wrm.util;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface GenericService<T, ID, C, U, R> {
+import java.util.List;
+import java.util.Optional;
 
-    C create(C createDTO);
+public interface GenericService<T, ID> {
 
-    C getById(ID id);
+    T save(T entity);
+    List<T> saveAll(List<T> entities);
+    Optional<T> findById(ID id);
+    List<T> findAll();
+    Page<T> findAll(Pageable pageable);
+    boolean existsById(ID id);
+    long count();
+    void deleteById(ID id);
+    void delete(T entity);
+    void deleteAll(List<T> entities);
+    void deleteAll();
 
-    Page<C> getAll(Pageable pageable);
-
-    R update(ID id, U updateDTO);
-
-    void delete(ID id);
-
-    boolean exists(ID id);
+    T update(ID id, T entity);
 }
 

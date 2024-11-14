@@ -5,6 +5,8 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import ma.hariti.asmaa.wrm.util.BaseEntity;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,10 +16,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WaitingList {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class WaitingList extends BaseEntity {
+
 
     @NotNull(message = "Date is required")
     @FutureOrPresent(message = "Date cannot be in the past")

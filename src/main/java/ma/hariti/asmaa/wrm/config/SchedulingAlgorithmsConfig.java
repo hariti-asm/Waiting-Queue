@@ -16,7 +16,6 @@ import java.util.List;
 @Getter
 @Setter
 public class SchedulingAlgorithmsConfig {
-
     private FifoConfig fifo;
     private PriorityConfig priority;
     private ShortestJobFirstConfig shortestJobFirst;

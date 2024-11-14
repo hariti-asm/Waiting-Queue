@@ -1,4 +1,4 @@
-package ma.hariti.asmaa.wrm.service;
+package ma.hariti.asmaa.wrm.repository;
 
 import ma.hariti.asmaa.wrm.entity.Visit;
 

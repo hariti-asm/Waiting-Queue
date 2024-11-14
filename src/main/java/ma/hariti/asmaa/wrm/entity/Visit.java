@@ -5,14 +5,17 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ma.hariti.asmaa.wrm.embeddedable.VisitId;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "visits")
 @NoArgsConstructor
