@@ -79,4 +79,17 @@ public class WaitingListController {
                     .body(ApiResponseDTO.error(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
         }
     }
+    @GetMapping
+    public ResponseEntity<ApiResponseDTO<List<WaitingListDto>>> getAllWaitingLists() {
+        try {
+            List<WaitingListDto> waitingLists = waitingListService.findAll();
+            log.info("Fetched {} waiting lists", waitingLists.size());
+            return ResponseEntity.ok(ApiResponseDTO.success(waitingLists));
+        } catch (Exception e) {
+            log.error("Error fetching waiting lists", e);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponseDTO.error("Error fetching waiting lists", HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        }
+    }
 }
