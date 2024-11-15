@@ -24,4 +24,5 @@ public class WaitingListService extends GenericServiceImpl<WaitingList, Long> {
         SchedulingStrategy strategy = strategyFactory.getStrategy(waitingList.getAlgorithm());
         return strategy.schedule(waitingList.getVisits());
     }
+
 }

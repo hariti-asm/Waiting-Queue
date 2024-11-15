@@ -1,4 +1,4 @@
-package ma.hariti.asmaa.wrm.service;
+package ma.hariti.asmaa.wrm.service.algorithm;
 
 import ma.hariti.asmaa.wrm.entity.Visit;
 import ma.hariti.asmaa.wrm.repository.SchedulingStrategy;

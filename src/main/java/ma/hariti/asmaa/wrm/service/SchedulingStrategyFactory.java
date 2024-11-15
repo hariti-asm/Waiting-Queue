@@ -2,6 +2,9 @@ package ma.hariti.asmaa.wrm.service;
 
 import ma.hariti.asmaa.wrm.config.SchedulingAlgorithmsConfig;
 import ma.hariti.asmaa.wrm.repository.SchedulingStrategy;
+import ma.hariti.asmaa.wrm.service.algorithm.FifoSchedulingStrategy;
+import ma.hariti.asmaa.wrm.service.algorithm.PrioritySchedulingStrategy;
+import ma.hariti.asmaa.wrm.service.algorithm.ShortestJobFirstStrategy;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
