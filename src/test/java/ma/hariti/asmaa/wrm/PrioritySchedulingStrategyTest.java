@@ -13,25 +13,21 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
 
 public class PrioritySchedulingStrategyTest {
+
+    private void printVisitDetails(String message, List<Visit> visits) {
+        System.out.println("\n" + message);
+        System.out.println("----------------------------------------");
+        for (Visit visit : visits) {
+            System.out.printf("Visit ID: %d | Arrival: %s | Priority: %d | Processing Time: %s minutes%n",
+                    visit.getId().getValue(),
+                    visit.getArrivalTime(),
+                    visit.getPriority(),
+                    visit.getEstimatedProcessingTime().toMinutes());
+        }
+        System.out.println("----------------------------------------\n");
+    }
 
     @Test
     public void testPrioritySchedulingStrategy() {
@@ -45,12 +41,11 @@ public class PrioritySchedulingStrategyTest {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // Create visits with different priorities
         Visit visit1 = new Visit(id1, now.minusHours(1),
                 LocalTime.of(9, 0), LocalTime.of(9, 10),
                 Status.PENDING, (byte) 5, Duration.ofMinutes(10), null, null);
 
-        Visit visit2 = new Visit(id2, now.minusHours(4), // Longest waiting time
+        Visit visit2 = new Visit(id2, now.minusHours(4),
                 LocalTime.of(8, 30), LocalTime.of(8, 33),
                 Status.PENDING, (byte) 3, Duration.ofMinutes(8), null, null);
 
@@ -60,29 +55,21 @@ public class PrioritySchedulingStrategyTest {
 
         List<Visit> visits = Arrays.asList(visit1, visit2, visit3);
 
-        // Create strategy with priority factors
+        printVisitDetails("Initial Visit Queue Before Scheduling:", visits);
+
         List<String> priorityFactors = Arrays.asList("waiting-time", "urgency", "severity");
         SchedulingStrategy priorityStrategy = new PrioritySchedulingStrategy(priorityFactors);
 
         // Act
         List<Visit> sortedVisits = priorityStrategy.schedule(visits);
 
-        // Debug print statements
-        System.out.println("Visit 1 Priority: " + visit1.getPriority());
-        System.out.println("Visit 2 Priority: " + visit2.getPriority());
-        System.out.println("Visit 3 Priority: " + visit3.getPriority());
+        printVisitDetails("Final Visit Queue After Priority Scheduling:", sortedVisits);
 
         // Assert
-        // Visit2 should be first due to longest waiting time (4 hours)
         assertEquals(id2, sortedVisits.get(0).getId());
-
-        // Visit3 should be second due to highest initial priority
         assertEquals(id3, sortedVisits.get(1).getId());
-
-        // Visit1 should be last
         assertEquals(id1, sortedVisits.get(2).getId());
 
-        // Verify the priority ordering
         assertTrue(sortedVisits.get(0).getPriority() > sortedVisits.get(1).getPriority(),
                 "First visit should have higher priority than second");
         assertTrue(sortedVisits.get(1).getPriority() > sortedVisits.get(2).getPriority(),
@@ -109,15 +96,15 @@ public class PrioritySchedulingStrategyTest {
 
         List<Visit> visits = Arrays.asList(visit1, visit2);
 
+        printVisitDetails("Initial Visit Queue Before Scheduling (Equal Priorities):", visits);
+
         List<String> priorityFactors = Arrays.asList("waiting-time", "urgency", "severity");
         SchedulingStrategy priorityStrategy = new PrioritySchedulingStrategy(priorityFactors);
 
         // Act
         List<Visit> sortedVisits = priorityStrategy.schedule(visits);
 
-        // Debug print statements
-        System.out.println("Equal Test - Visit 1 Priority: " + visit1.getPriority());
-        System.out.println("Equal Test - Visit 2 Priority: " + visit2.getPriority());
+        printVisitDetails("Final Visit Queue After Priority Scheduling (Equal Priorities):", sortedVisits);
 
         // Assert
         assertEquals(id2, sortedVisits.get(0).getId(),

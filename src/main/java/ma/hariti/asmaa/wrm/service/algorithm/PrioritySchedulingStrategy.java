@@ -6,14 +6,15 @@ import ma.hariti.asmaa.wrm.repository.SchedulingStrategy;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
 public class PrioritySchedulingStrategy implements SchedulingStrategy {
     private final List<String> priorityFactors;
-    private static final int URGENCY_WEIGHT = 10;
-    private static final int SEVERITY_WEIGHT = 8;
-    private static final int WAITING_TIME_WEIGHT = 4;
+    private static final int WAITING_TIME_WEIGHT = 15;
+    private static final int PRIORITY_WEIGHT = 8;
+    private static final int PROCESSING_TIME_WEIGHT = 5;
 
     public PrioritySchedulingStrategy(List<String> priorityFactors) {
         this.priorityFactors = priorityFactors;
@@ -21,15 +22,24 @@ public class PrioritySchedulingStrategy implements SchedulingStrategy {
 
     @Override
     public List<Visit> schedule(List<Visit> visits) {
-        visits.forEach(visit -> visit.setPriority((byte) 0));
+        Map<Visit, Integer> rawScores = new HashMap<>();
+        visits.forEach(visit -> rawScores.put(visit, calculateRawScore(visit)));
+
+        int minScore = rawScores.values().stream().mapToInt(Integer::intValue).min().orElse(0);
+        int maxScore = rawScores.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+
+        visits.forEach(visit -> {
+            int rawScore = rawScores.get(visit);
+            byte normalizedScore = (byte) (1 + ((rawScore - minScore) * 9) / Math.max(1, maxScore - minScore));
+            visit.setPriority(normalizedScore);
+        });
 
         return visits.stream()
-                .peek(this::calculatePriorityScore)
                 .sorted(Comparator.comparing(Visit::getPriority).reversed())
                 .collect(Collectors.toList());
     }
 
-    private void calculatePriorityScore(Visit visit) {
+    private int calculateRawScore(Visit visit) {
         int score = 0;
         System.out.println("Calculating score for visit " + visit.getId());
 
@@ -55,24 +65,22 @@ public class PrioritySchedulingStrategy implements SchedulingStrategy {
             System.out.println("Running total: " + score);
         }
 
-        score = Math.min(127, Math.max(-128, score));
-        visit.setPriority((byte) score);
-        System.out.println("Final score: " + score);
+        return score;
     }
 
     private int calculateWaitingTimeScore(Visit visit) {
         Duration waitingTime = Duration.between(visit.getArrivalTime(), LocalDateTime.now());
-        return (int) (waitingTime.toHours() * WAITING_TIME_WEIGHT);
+        long hours = waitingTime.toHours();
+        return (int) (Math.pow(hours + 1, 2) * WAITING_TIME_WEIGHT);
     }
 
     private int calculateUrgencyScore(Visit visit) {
-        Duration timeUntilArrival = Duration.between(LocalDateTime.now(), visit.getArrivalTime());
-        return (int) Math.max(0, timeUntilArrival.toMinutes()) * URGENCY_WEIGHT;
+        return (int) (Math.pow(visit.getPriority(), 2) * PRIORITY_WEIGHT);
     }
 
     private int calculateSeverityScore(Visit visit) {
-        long estimatedProcessingTimeMinutes = visit.getEstimatedProcessingTime().toMinutes();
-        return (int) Math.max(0, estimatedProcessingTimeMinutes) * SEVERITY_WEIGHT;
+        long processingMinutes = visit.getEstimatedProcessingTime().toMinutes();
+        return (int) (processingMinutes * PROCESSING_TIME_WEIGHT);
     }
 
     @Override
