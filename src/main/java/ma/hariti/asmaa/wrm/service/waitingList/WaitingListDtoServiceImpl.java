@@ -1,4 +1,4 @@
-package ma.hariti.asmaa.wrm.service;
+package ma.hariti.asmaa.wrm.service.waitingList;
 
 import jakarta.persistence.EntityNotFoundException;
 import ma.hariti.asmaa.wrm.dto.VisitDTO;
@@ -8,6 +8,7 @@ import ma.hariti.asmaa.wrm.entity.WaitingList;
 import ma.hariti.asmaa.wrm.mapper.VisitMapper;
 import ma.hariti.asmaa.wrm.mapper.WaitingListMapper;
 import ma.hariti.asmaa.wrm.repository.SchedulingStrategy;
+import ma.hariti.asmaa.wrm.service.SchedulingStrategyFactory;
 import ma.hariti.asmaa.wrm.util.GenericDtoServiceImpl;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class WaitingListDtoService extends GenericDtoServiceImpl<WaitingListDto, WaitingList, Long> {
+public class WaitingListDtoServiceImpl extends GenericDtoServiceImpl<WaitingListDto, WaitingList, Long> {
     private final SchedulingStrategyFactory strategyFactory;
     private final WaitingListMapper waitingListMapper;
     private final VisitMapper visitMapper;
 
-    protected WaitingListDtoService(JpaRepository<WaitingList, Long> repository,
-                                    SchedulingStrategyFactory strategyFactory,
-                                    WaitingListMapper waitingListMapper,
-                                    VisitMapper visitMapper) {
+    protected WaitingListDtoServiceImpl(JpaRepository<WaitingList, Long> repository,
+                                        SchedulingStrategyFactory strategyFactory,
+                                        WaitingListMapper waitingListMapper,
+                                        VisitMapper visitMapper) {
         super(repository);
         this.strategyFactory = strategyFactory;
         this.waitingListMapper = waitingListMapper;

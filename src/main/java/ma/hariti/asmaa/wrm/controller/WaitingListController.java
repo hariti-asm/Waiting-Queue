@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import ma.hariti.asmaa.wrm.dto.ApiResponseDTO;
 import ma.hariti.asmaa.wrm.dto.VisitDTO;
 import ma.hariti.asmaa.wrm.dto.WaitingListDto;
-import ma.hariti.asmaa.wrm.service.WaitingListDtoService;
+import ma.hariti.asmaa.wrm.service.waitingList.WaitingListDtoServiceImpl;
 import ma.hariti.asmaa.wrm.util.GenericDtoServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +18,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/waiting-lists")
 public class WaitingListController {
-    private final WaitingListDtoService waitingListService;
+    private final WaitingListDtoServiceImpl waitingListService;
     private static final Logger log = LoggerFactory.getLogger(GenericDtoServiceImpl.class);
 
-    public WaitingListController(WaitingListDtoService waitingListService) {
+    public WaitingListController(WaitingListDtoServiceImpl waitingListService) {
         this.waitingListService = waitingListService;
     }
 
