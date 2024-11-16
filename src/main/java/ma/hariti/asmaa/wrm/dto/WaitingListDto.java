@@ -1,8 +1,9 @@
 package ma.hariti.asmaa.wrm.dto;
+
 import jakarta.validation.constraints.*;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,8 +20,7 @@ public class WaitingListDto {
     private Date date;
 
     @NotBlank(message = "Algorithm name is required")
-    @Pattern(regexp = "^(fifo|priority|shortest_job_first)$",
-            message = "Invalid algorithm name")
+    @Pattern(regexp = "^(First In First Out|Priority|Shortest Job First)$", message = "Invalid algorithm name")
     @Size(max = 100, message = "Algorithm name must not exceed 100 characters")
     private String algorithm;
 

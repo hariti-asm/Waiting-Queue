@@ -56,4 +56,24 @@ public class Visit {
     @ManyToOne
     private WaitingList waitingList;
 
+    // Add constructor for test cases
+    public Visit(VisitId id, LocalDateTime arrivalTime, LocalTime startTime, LocalTime endDate,
+                 Status status, Byte priority, Duration estimatedProcessingTime,
+                 Visitor visitor, WaitingList waitingList) {
+        this.id = id;
+        this.arrivalTime = arrivalTime;
+        this.startTime = startTime;
+        this.endDate = endDate;
+        this.status = status;
+        this.priority = priority;
+        this.estimatedProcessingTime = estimatedProcessingTime;
+        this.visitor = visitor;
+        this.waitingList = waitingList;
+    }
+
+    // This method is used for FIFO sorting
+    public LocalDateTime getStartDateTime() {
+        // Combine arrival date with start time for proper ordering
+        return arrivalTime.toLocalDate().atTime(startTime);
+    }
 }

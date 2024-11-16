@@ -11,7 +11,12 @@ public class FifoSchedulingStrategy  implements SchedulingStrategy {
 
     @Override
     public List<Visit> schedule(List<Visit> visits) {
-        return visits.stream().sorted(Comparator.comparing(Visit::getArrivalTime)).collect(Collectors.toList());
+        return visits.stream()
+                .sorted(Comparator.comparing(
+                        Visit::getArrivalTime,
+                        Comparator.nullsFirst(Comparator.naturalOrder())
+                ))
+                .collect(Collectors.toList());
     }
 
     @Override
