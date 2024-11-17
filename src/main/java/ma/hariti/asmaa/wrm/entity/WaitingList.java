@@ -41,6 +41,8 @@ public class WaitingList extends BaseEntity {
 
     @OneToMany(mappedBy = "waitingList", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Visit> visits = new ArrayList<>();
+    @Id
+    private Long id;
 
     public void setAlgorithm(String algorithmName) {
         if (algorithmName == null) {
@@ -49,13 +51,5 @@ public class WaitingList extends BaseEntity {
         this.algorithm = algorithmName;
     }
 
-    public void addVisit(Visit visit) {
-        visits.add(visit);
-        visit.setWaitingList(this);
-    }
 
-    public void removeVisit(Visit visit) {
-        visits.remove(visit);
-        visit.setWaitingList(null);
-    }
 }

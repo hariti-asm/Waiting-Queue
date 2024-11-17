@@ -1,79 +1,80 @@
 package ma.hariti.asmaa.wrm.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ma.hariti.asmaa.wrm.embeddedable.VisitId;
 import ma.hariti.asmaa.wrm.enumeration.Status;
+import ma.hariti.asmaa.wrm.util.BaseEntity;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "visits")
+@Getter
+@Setter
 @NoArgsConstructor
-public class Visit {
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+public class Visit extends BaseEntity {
 
     @EmbeddedId
-    @AttributeOverrides({
-            @AttributeOverride(name = "value", column = @Column(name = "id"))
-    })
     private VisitId id;
 
-    @NotNull(message = "Arrival time is required")
-    private LocalDateTime arrivalTime;
-
-    @NotNull(message = "Start time is required")
-    private LocalTime startTime;
-
-    @NotNull(message = "End date is required")
-    private LocalTime endDate;
-
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "Status is required")
-    private Status status;
-
-    @NotNull(message = "Priority is required")
-    @Min(value = 1, message = "Priority must be at least 1")
-    @Max(value = 10, message = "Priority must not exceed 10")
-    private Byte priority;
-
-    @NotNull(message = "Estimated processing time is required")
-    private Duration estimatedProcessingTime;
-
-    @NotNull(message = "Visitor is required")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("visitorId")
+    @JoinColumn(name = "visitor_id", nullable = false)
     private Visitor visitor;
 
-    @NotNull(message = "Waiting list is required")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId("waitingListId")
+    @JoinColumn(name = "waiting_list_id", nullable = false)
     private WaitingList waitingList;
 
-    public Visit(VisitId id, LocalDateTime arrivalTime, LocalTime startTime, LocalTime endDate,
-                 Status status, Byte priority, Duration estimatedProcessingTime,
-                 Visitor visitor, WaitingList waitingList) {
+    @Column(nullable = false)
+    private LocalDateTime arrivalTime;
+
+    @Column(nullable = false)
+    private LocalTime startTime;
+
+    @Column(nullable = false)
+    private LocalTime endTime;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Status status;
+
+    @Column(nullable = false)
+    private Byte priority;
+    @Column(nullable = false)
+    private Duration estimatedProcessingTime;
+
+    public Visit(VisitId id, Duration estimatedProcessingTime) {
         this.id = id;
-        this.arrivalTime = arrivalTime;
-        this.startTime = startTime;
-        this.endDate = endDate;
-        this.status = status;
-        this.priority = priority;
         this.estimatedProcessingTime = estimatedProcessingTime;
-        this.visitor = visitor;
-        this.waitingList = waitingList;
     }
 
+    public Visit(VisitId id, LocalDateTime arrivalTime, LocalTime startTime, LocalTime endTime,
+                 Status status, byte priority, Duration estimatedProcessingTime) {
+    }
 
-    public Visit(VisitId visitId, Duration estimatedProcessingTime) {
-        this.id = visitId;
-        this.estimatedProcessingTime = estimatedProcessingTime;
+    @PrePersist
+    protected void onCreate() {
+        if (id == null && visitor != null && waitingList != null) {
+            id = new VisitId(visitor.getId(), waitingList.getId());
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        if (id == null && visitor != null && waitingList != null) {
+            id = new VisitId(visitor.getId(), waitingList.getId());
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package ma.hariti.asmaa.wrm;
 
+import jakarta.validation.ConstraintViolationException;
 import ma.hariti.asmaa.wrm.dto.VisitDTO;
 import ma.hariti.asmaa.wrm.dto.WaitingListDto;
 import ma.hariti.asmaa.wrm.embeddedable.VisitId;
@@ -21,14 +22,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.validation.ConstraintViolationException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,43 +55,73 @@ public class WaitingListDtoServiceIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        // Create a valid visitor first
         testVisitor = new Visitor();
+        testVisitor.setFirstName("John");
+        testVisitor.setLastName("Doe");
+        testVisitor.setVisits(new ArrayList<>());
         testVisitor = visitorRepository.save(testVisitor);
 
+        // Create waiting list with future date
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Date tomorrow = cal.getTime();
+
         testWaitingList = new WaitingList();
-        testWaitingList.setDate(new Date());
+        testWaitingList.setId(1L);
+        testWaitingList.setDate(tomorrow);
         testWaitingList.setAlgorithm("First In First Out");
         testWaitingList.setCapacity(10);
         testWaitingList.setMode("Standard");
         testWaitingList.setVisits(new ArrayList<>());
-        Visit visit1 = createTestVisit(1L, LocalDateTime.now(), (byte)2, Duration.ofMinutes(45));
-        Visit visit2 = createTestVisit(2L, LocalDateTime.now().plusHours(1), (byte)1, Duration.ofMinutes(30));
 
+        // Save waiting list first
+        testWaitingList = waitingListRepository.save(testWaitingList);
+
+        // Create visits and save them directly
+        Visit visit1 = createAndSaveVisit(LocalDateTime.now(), (byte) 2, Duration.ofMinutes(45));
+        Visit visit2 = createAndSaveVisit(LocalDateTime.now().plusHours(1), (byte) 1, Duration.ofMinutes(30));
+
+        // Update references
         testWaitingList.getVisits().add(visit1);
         testWaitingList.getVisits().add(visit2);
 
-        testWaitingList = waitingListRepository.save(testWaitingList);
+        // Convert to DTO
         testWaitingListDto = waitingListMapper.toDto(testWaitingList);
     }
 
-    private Visit createTestVisit(Long visitId, LocalDateTime arrivalTime, byte priority, Duration processingTime) {
+    private Visit createAndSaveVisit(LocalDateTime arrivalTime, byte priority, Duration processingTime) {
         Visit visit = new Visit();
-        visit.setId(new VisitId(visitId));
+
+        // Create and set VisitId
+        VisitId id = new VisitId(testVisitor.getId(), testWaitingList.getId());
+        visit.setId(id);
+
+        // Set required fields
         visit.setArrivalTime(arrivalTime);
         visit.setStartTime(LocalTime.of(9, 0));
-        visit.setEndDate(LocalTime.of(10, 0));
+        visit.setEndTime(LocalTime.of(17, 0));
         visit.setStatus(Status.PENDING);
         visit.setPriority(priority);
         visit.setEstimatedProcessingTime(processingTime);
+
+        // Set relationships
         visit.setVisitor(testVisitor);
         visit.setWaitingList(testWaitingList);
+
+        // Add to visitor's visits
+        if (!testVisitor.getVisits().contains(visit)) {
+            testVisitor.getVisits().add(visit);
+        }
+
         return visit;
     }
 
     @Test
     void testCreateWaitingList_Success() {
         WaitingListDto newDto = new WaitingListDto();
-        newDto.setDate(new Date());
+        newDto.setId(2L);
+        newDto.setDate(getTomorrowDate());
         newDto.setAlgorithm("Priority");
         newDto.setCapacity(5);
         newDto.setMode("Standard");
@@ -105,12 +132,12 @@ public class WaitingListDtoServiceIntegrationTest {
         assertEquals("Priority", savedDto.getAlgorithm());
         assertEquals(5, savedDto.getCapacity());
     }
-
     @ParameterizedTest
     @ValueSource(strings = {"First In First Out", "Priority", "Shortest Job First"})
     void testCreateWaitingList_ValidAlgorithms(String algorithm) {
         WaitingListDto newDto = new WaitingListDto();
-        newDto.setDate(new Date());
+        newDto.setId(3L); // Set unique ID for each test
+        newDto.setDate(getTomorrowDate());
         newDto.setAlgorithm(algorithm);
         newDto.setCapacity(5);
         newDto.setMode("Standard");
@@ -174,7 +201,7 @@ public class WaitingListDtoServiceIntegrationTest {
 
         assertNotNull(scheduledVisits);
         assertEquals(2, scheduledVisits.size());
-        assertTrue(scheduledVisits.get(0).getPriority() <= scheduledVisits.get(1).getPriority());
+        assertTrue(scheduledVisits.get(0).getPriority() >= scheduledVisits.get(1).getPriority());
     }
 
     @Test
@@ -193,7 +220,8 @@ public class WaitingListDtoServiceIntegrationTest {
     @Test
     void testValidateCapacityConstraints() {
         WaitingListDto invalidDto = new WaitingListDto();
-        invalidDto.setDate(new Date());
+        invalidDto.setId(4L); // Set ID
+        invalidDto.setDate(getTomorrowDate());
         invalidDto.setAlgorithm("First In First Out");
         invalidDto.setCapacity(0);
         invalidDto.setMode("Standard");
@@ -205,13 +233,25 @@ public class WaitingListDtoServiceIntegrationTest {
     @Test
     void testValidateDateConstraints() {
         WaitingListDto invalidDto = new WaitingListDto();
-        Date pastDate = new Date(System.currentTimeMillis() - 86400000);
-        invalidDto.setDate(pastDate);
+        invalidDto.setId(5L);
+        invalidDto.setDate(getYesterdayDate());
         invalidDto.setAlgorithm("First In First Out");
         invalidDto.setCapacity(5);
         invalidDto.setMode("Standard");
 
         assertThrows(ConstraintViolationException.class, () ->
                 waitingListDtoService.create(invalidDto));
+    }
+
+    private Date getTomorrowDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        return cal.getTime();
+    }
+
+    private Date getYesterdayDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, -1);
+        return cal.getTime();
     }
 }

@@ -1,8 +1,8 @@
 package ma.hariti.asmaa.wrm.dto;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import ma.hariti.asmaa.wrm.embeddedable.VisitId;
 
 import java.util.List;
 
@@ -19,4 +19,5 @@ public class VisitorDTO {
     private String lastName;
 
 
-    private List<VisitId> visitIds;}
+    private List<Long> visitIds;
+}

@@ -1,4 +1,4 @@
-package ma.hariti.asmaa.survey.survey.util;
+package ma.hariti.asmaa.wrm.util;
 
 import lombok.Data;
 
